@@ -1,0 +1,16 @@
+{
+  "name": "usrhub",
+  "version": "0.1.0",
+  "description": "",
+  "main": "usrhub.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "phoenix": "^1.4.0",
+    "request": "^2.88.0",
+    "websocket": "^1.0.28"
+  }
+}
