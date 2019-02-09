@@ -8,7 +8,7 @@ export default ({secret_key, usr, hub, func}) => {
   //join channel wwith app_id + hub_name
 
   const socket = new Socket("wss://usrhub.com/socket")
-  let state = { x: 0, y: 0 }
+  let state = { count: 0 }
   
   // configure the event handlers
   socket.onOpen(event => console.log('Connected.'))
@@ -32,20 +32,15 @@ export default ({secret_key, usr, hub, func}) => {
   chan.onClose(event => console.log('Channel closed.'))
 
   const ping = (payload) => {
-    chan.push('ping', {body: payload, usr}, 10000)
+    chan.push('ping', {body: payload, usr}, 20000)
       .receive('ok', (msg) => {
-        state = msg.body
         console.log(msg.body + ' from ' + msg.usr.name)
       })
       .receive('error', (reasons) => console.log('flop', reasons))
       .receive('timeout', () => console.log('slow much?'))
   }
 
-  const test = () => {
-    return state
-  }
- 
-  const call = (lambda, payload) => {
+  const dispatch = (lambda, payload) => {
     chan.push(lambda, payload)
       .receive('ok', (payload) => {
         state = payload
@@ -54,15 +49,28 @@ export default ({secret_key, usr, hub, func}) => {
       .receive('timeout', () => console.log('slow much?'))
   }
 
-  chan.on('shout', lambda => {
-    func && func(lambda)
-  })
+
+  const on = (name, f) => {
+    chan.on(name, lambda => {
+      console.log("incomming lambda " + name)
+      f && f(lambda)
+    })
+  }
 
   // a function to shut it all down
   const close = () => socket.disconnect()
  
-  return { ping, close, test, call }
+  return { ping, close, state, dispatch, on }
 }
 
-//module.exports =  { start, join }
+const createStorage = () => {
+  console.log("Creting store with hub ")
 
+  let state = 0;
+
+
+  return [state, null]
+}
+
+export const useHubState = createStorage();
+export const trigger = (f) => makeTrigger(f); 
